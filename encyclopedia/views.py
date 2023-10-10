@@ -28,5 +28,32 @@ def entry_page(request, title):
            "title": title,
            "content":markdowner.convert(util.get_entry(title))
        })
-       
-   
+
+# Search
+def search(request):
+    if request.method == "POST":
+        # get the input.
+        title = request.POST.get("q", "")
+        entries = util.list_entries()
+        # if the input is empty.
+        if not title: 
+            return render(request, "encyclopedia/error.html", {
+                    "title": "something went wrong",
+                    "message": "Input is empty"
+            })
+        # sub string matches.
+        substring_match = [entry for entry in entries if title.lower() in entry.lower()]
+        if substring_match:
+            return render(request, "encyclopedia/search.html", {
+            "result": substring_match
+        })
+        # if page is not exist.
+        else:
+            return render(request, "encyclopedia/error.html", {
+                    "title": "something went wrong",
+                    "message": "Page does not exist."
+            })
+
+            
+        
+        
