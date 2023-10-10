@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from markdown2 import Markdown
 from . import util
+import random
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
@@ -78,6 +79,37 @@ def newpage(request):
        })
     else:
          return render(request, "encyclopedia/newpage.html")
+
+
+# RANDOM PAGE
+def random_page(request):
+    entries = util.list_entries()
+    random_entry = random.choice(entries)
+    return render(request, "encyclopedia/entryPage.html", { 
+        "title": random_entry,
+        "content": markdowner.convert(util.get_entry(random_entry))
+    })
+    
+# Edit Page 
+def edit(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        content = util.get_entry(title)
+
+        return render(request, "encyclopedia/edit.html", {
+            "title": title,
+            "content" : content
+        })
+
+# save the edited page.
+def save(request):
+    title = request.POST.get("title")
+    content = request.POST.get("content", "")
+    util.save_entry(title, content)
+    return render(request, "encyclopedia/entryPage.html", {
+        "title": title,
+        "content": markdowner.convert(content)
+    })
 
          
 
